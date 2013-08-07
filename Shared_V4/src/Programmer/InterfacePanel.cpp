@@ -55,6 +55,13 @@
 #include "ApplicationFiles.h"
 #include "Log.h"
 
+#ifdef __APPLE__
+ typedef uint64_t tulong;
+ #else
+ typedef uint32_t tulong;
+#endif
+
+
 //===================================================================
 //! Obtains the version of the BDM library as a string
 //!
@@ -433,7 +440,7 @@ bool InterfacePanel::TransferDataToWindow() {
    }
    // Make BDM # & string consistent with display
    int choice = bdmSelectChoiceControl->GetSelection();
-   bdmDeviceNum = (int)bdmSelectChoiceControl->GetClientData(choice);
+   bdmDeviceNum = (int)(tulong)bdmSelectChoiceControl->GetClientData(choice);
    bdmIdentification = bdmSelectChoiceControl->GetStringSelection();
 
    Logging::print("Device# = %d, BDM = \'%s\'\n", bdmDeviceNum, (const char *)bdmIdentification.ToAscii());
@@ -724,7 +731,7 @@ void InterfacePanel::populateBDMChoices(void) {
       // Select 1st device by default
       bdmSelectChoiceControl->Select(0);
    }
-   bdmDeviceNum      = (int)bdmSelectChoiceControl->GetClientData();
+   bdmDeviceNum      = (int)(tulong)bdmSelectChoiceControl->GetClientData();
    bdmIdentification = bdmSelectChoiceControl->GetStringSelection();
 
    bdmSelectChoiceControl->Enable(deviceCount>1);
@@ -749,7 +756,7 @@ void InterfacePanel::OnBDMSelectComboSelected( wxCommandEvent& event ) {
    Logging log("InterfacePanel::OnBDMSelectComboSelected");
 
    Logging::print("event.GetSelection() = %d\n", event.GetSelection());
-   bdmDeviceNum = (int)bdmSelectChoiceControl->GetClientData(event.GetSelection());
+   bdmDeviceNum = (int)(tulong)bdmSelectChoiceControl->GetClientData(event.GetSelection());
    Logging::print("bdmDeviceNum = %d\n", bdmDeviceNum);
    ;
    shared->setBdmSerialNumber(connectedBDMs[bdmDeviceNum].getSerialNumber());

@@ -19,6 +19,9 @@
 #ifdef __unix__
 #include <dlfcn.h>
 #define WXSTUB_DLL_NAME "libusbdm-wxStub.so"
+#elif __APPLE__
+#include <dlfcn.h>
+#define WXSTUB_DLL_NAME "libusbdm-wxStub.dylib"
 #endif
 
 #include "Common.h"
@@ -210,6 +213,11 @@ int main(int argc, char **argv) {
    // Load wxWindows Stub (for pop-up dialogues)
    (void)dlopen(WXSTUB_DLL_NAME, RTLD_NOW|RTLD_NODELETE);
 #endif
+#ifdef __APPLE__
+   // Load wxWindows Stub (for pop-up dialogues)
+   (void)dlopen(WXSTUB_DLL_NAME, RTLD_NOW|RTLD_NODELETE);
+#endif
+
 #ifdef WIN32
    // Initiate use of the Winsock DLL by this process.
    WSADATA wsaData;

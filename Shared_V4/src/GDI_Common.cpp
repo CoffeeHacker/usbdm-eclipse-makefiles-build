@@ -56,6 +56,9 @@ Change History
 #ifdef __unix__
 #include <dlfcn.h>
 #define WXSTUB_DLL_NAME "libusbdm-wxStub.so"
+#elif __APPLE__
+#include <dlfcn.h>
+#define WXSTUB_DLL_NAME "libusbdm-wxStub.dylib"
 #endif
 #include "Common.h"
 #include "Log.h"
@@ -2131,6 +2134,54 @@ gdi_dll_initialize(void) {
 
    // Lock Library in memory!
    if (libHandle == NULL) {
+      libHandle = dlopen(GDI_DLL_NAME, :if expand("%") == ""|browse confirm w|else|confirm w|endif
+RTLD_NOW|RTLD_NODELETE);
+      if (libHandle == NULL) {
+         fprintf(stderr, "gdi_dll_initialize() - Library failed to lock %s\n", dlerror());
+         return;
+      }
+      else
+         fprintf(stderr, "gdi_dll_initialize() - Library locked OK\n");
+   }
+   else
+      fprintf(stderr, "gdi_dll_initialize() - Library already locked\n");
+#ifdef __unix__
+   // Load wxWindows Stub
+   (void)dlopen(WXSTUB_DLL_NAME, RTLD_NOW|RTLD_NODELETE);
+#endif
+}
+
+extern "C"
+void
+__attribute__ ((destructor))
+gdi_dll_uninitialize(void) {
+}
+#elif __APPLE__
+
+#if   TARGET == ARM
+#define GDI_DLL_NAME "usbdm-arm-gdi-debug.so"
+#elif TARGET == CFV1
+#define GDI_DLL_NAME "usbdm-cfv1-gdi-debug.so"
+#elif TARGET == CFVx
+#define GDI_DLL_NAME "usbdm-cfvx-gdi-debug.so"
+#elif TARGET == MC56F80xx
+#define GDI_DLL_NAME "usbdm-dsc-gdi-debug.so"
+#elif TARGET == HCS08
+#define GDI_DLL_NAME "usbdm-hcs08-gdi-debug.so"
+#elif TARGET == HCS12
+#define GDI_DLL_NAME "usbdm-hcs12-gdi-debug.so"
+#elif TARGET == RS08
+#define GDI_DLL_NAME "usbdm-rs08-gdi-debug.so"
+#endif
+
+extern "C"
+void
+__attribute__ ((constructor))
+gdi_dll_initialize(void) {
+   static void *libHandle = NULL;
+
+   // Lock Library in memory!
+   if (libHandle == NULL) {
       libHandle = dlopen(GDI_DLL_NAME, RTLD_NOW|RTLD_NODELETE);
       if (libHandle == NULL) {
          fprintf(stderr, "gdi_dll_initialize() - Library failed to lock %s\n", dlerror());
@@ -2152,6 +2203,7 @@ void
 __attribute__ ((destructor))
 gdi_dll_uninitialize(void) {
 }
+
 #else
 #include <windef.h>
 extern "C" WINAPI __declspec(dllexport)

@@ -14,6 +14,8 @@
 #include <string.h>
 #ifdef __unix__
 #include <memory.h> // linux
+#elif __APPLE__
+#include <memory.h> // mac
 #else
 #include <mem.h> // win
 #endif

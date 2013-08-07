@@ -28,9 +28,11 @@ DEFS += $(WXWIDGETS_DEFS)
 # Look for include files in each of the modules
 INCS := $(patsubst %,-I%,$(SOURCEDIRS))
 INCS += $(WXWIDGETS_INC)
+INCS += -I/opt/local/include
 
 # Extra Library dirs
 LIBDIRS += $(WXWIDGETS_LIBDIRS)
+LIBDIRS += -L/opt/local/lib
 
 # Extra libraries
 LIBS += -l$(LIB_USB)

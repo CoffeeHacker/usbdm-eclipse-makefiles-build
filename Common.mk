@@ -36,12 +36,22 @@ ifeq ($(UNAME_S),Windows)
    #PROGRAM_DIR = C:/"Program Files"
    PROGRAM_DIR = C:/"Program Files (x86)"
 else
+ifeq ($(UNAME_S),Darwin)
+   .SUFFIXES : .d
+   LIB_PREFIX 			:= lib
+   LIB_SUFFIX 			:= .dylib.$(MAJOR_VERSION).$(MINOR_VERSION)
+   LIB_MAJOR_SUFFIX 	:= .dylib.$(MAJOR_VERSION)
+   LIB_NO_SUFFIX 		:= .dylib
+   EXE_SUFFIX 			:= 
+
+else
    .SUFFIXES : .d
    LIB_PREFIX 			:= lib
    LIB_SUFFIX 			:= .so.$(MAJOR_VERSION).$(MINOR_VERSION)
    LIB_MAJOR_SUFFIX 	:= .so.$(MAJOR_VERSION)
    LIB_NO_SUFFIX 		:= .so
    EXE_SUFFIX 			:= 
+endif
 
    MINGWBIN := 
    MSYSBIN  := 
@@ -85,13 +95,13 @@ WDI_LIBS       := -lwdi-static -lsetupapi -lole32  -lcomctl32
 #===========================================================
 # TCL
 # Pick up shared DLLs from Shared_V4/lib
-TCL_LIBDIRS    := 
+TCL_LIBDIRS    := -L/opt/local/lib
 ifeq ($(UNAME_S),Windows)
    TCL_INC        := -IC:/Apps/Tcl/include
    TCL_LIBS       := -ltcl85
 else
-   TCL_INC        :=
-   TCL_LIBS       := -ltcl8.5
+   TCL_INC        := -I/opt/local/include
+   TCL_LIBS       := -ltcl8.6
 endif
 
 #===========================================================
@@ -174,10 +184,10 @@ ifeq ($(UNAME_S),Windows)
    XERCES_SHARED_LIBS    := -lxerces-c-3-1
    XERCES_STATIC_LIBS    := -lxerces-c
    else
-   XERCES_INC     :=
+   XERCES_INC     := -I/opt/local/include
 
    # Pick up shared DLLs from Shared_V4/lib
-   XERCES_SHARED_LIBDIRS := 
+   XERCES_SHARED_LIBDIRS := -L/opt/local/lib
    XERCES_STATIC_LIBDIRS := 
    XERCES_SHARED_LIBS    := -lxerces-c
    XERCES_STATIC_LIBS    := 
@@ -204,7 +214,11 @@ ifeq ($(UNAME_S),Windows)
    JAVA_INC := -I$(PROGRAM_DIR)/Java/jdk1.7.0_21/include
    JAVA_INC += -I$(PROGRAM_DIR)/Java/jdk1.7.0_21/include/win32
 else
+ifeq ($(UNAME_S),Darwin)
+  JAVA_INC := -I/Library/Java/JavaVirtualMachines/jdk1.7.0_17.jdk/Contents/Home/include
+else
    JAVA_INC := -I/usr/lib/jvm/default-java/include
+endif
 endif
 
 #===========================================================

@@ -13,6 +13,11 @@
 #include <dlfcn.h>
 #endif
 
+#ifdef __APPLE__
+#include <dlfcn.h>
+#endif
+
+
 #ifdef _WIN32
 #include <wx/msw/private.h>
 #include <wx/msw/registry.h>
@@ -156,8 +161,48 @@ dll_uninitialize(void) {
    //fprintf(logFile, "wxWindowsStub::dll_uninitialize() - done\n");
 }
 
-#else
+#endif
 
+#ifdef __APPLE__
+
+#define DLL_NAME "libusbdm-wxPlugin.dylib"
+
+static void *libHandle = NULL;
+
+extern "C"
+void __attribute__ ((constructor))
+dll_initialize(void) {
+//   fprintf(stderr, "dll_initialize()...\n");
+   // Lock Library in memory!
+   if (libHandle == NULL) {
+      libHandle = dlopen(DLL_NAME, RTLD_NOW|RTLD_NODELETE);
+      if (libHandle == NULL) {
+         fprintf(stderr, "wxWindowsStub::dll_initialize() - Library \'%s\' failed to lock %s\n", DLL_NAME, dlerror());
+         return;
+      }
+//      else {
+//         fprintf(stderr, "wxWindowsStub::dll_initialize() - Library \'%s\' locked OK (a=%p)\n", DLL_NAME, libHandle);
+//      }
+   }
+   else {
+      fprintf(stderr, "wxWindowsStub::dll_initialize() - Library \%s\' already locked (a=%p)\n", DLL_NAME, libHandle);
+   }
+}
+
+extern "C"
+void __attribute__ ((destructor))
+dll_uninitialize(void) {
+//   destroyWxAppInstance();
+//   if (libHandle != NULL)
+//      dlclose(libHandle);
+//   fprintf(stderr, "wxWindowsStub::dll_uninitialize()...\n");
+//   dll_close();
+   //fprintf(logFile, "wxWindowsStub::dll_uninitialize() - done\n");
+}
+
+#endif
+
+#ifdef _WIN32
 extern "C" WINAPI __declspec(dllexport)
 bool DllMain(HINSTANCE  hDLLInst,
              DWORD      fdwReason,

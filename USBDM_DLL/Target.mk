@@ -30,7 +30,7 @@ INCS := $(patsubst %,-I%,$(SOURCEDIRS))
 INCS += 
 
 # Extra Library dirs
-LIBDIRS += 
+LIBDIRS += -L/opt/local/lib
 
 # Extra libraries
 LIBS += -l$(LIB_USB)

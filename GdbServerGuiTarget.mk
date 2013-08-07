@@ -44,8 +44,8 @@ endif
 LIBS += $(WXWIDGETS_LIBS)
 LIBS += $(XERCES_LIBS)
 #LIBS += -l$(LIB_WX_PLUGIN)
-LIBS += $(LIB_SOCKETS)
-LIBS += -lwxbase294u_net_gcc_custom
+#LIBS += $(LIB_SOCKETS)
+#LIBS += -lwxbase294u_net_gcc_custom
 
 # Each module will add to this
 SRC :=

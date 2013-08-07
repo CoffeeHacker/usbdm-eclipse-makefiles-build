@@ -117,6 +117,59 @@ const char *libusb_error_name(int errNo) {
 }
 #endif
 
+#ifdef __APPLE__
+DLL_LOCAL
+const char *libusb_error_name(int errNo) {
+      switch (errNo) {
+
+      /** Success (no error) */
+      case LIBUSB_SUCCESS:
+         return "LIBUSB_SUCCESS";
+      /** Input/output error */
+      case LIBUSB_ERROR_IO:
+         return "LIBUSB_ERROR_IO";
+      /** Invalid parameter */
+      case LIBUSB_ERROR_INVALID_PARAM:
+         return "LIBUSB_ERROR_INVALID_PARAM";
+      /** Access denied (insufficient permissions) */
+      case LIBUSB_ERROR_ACCESS:
+         return "LIBUSB_ERROR_ACCESS";
+      /** No such device (it may have been disconnected) */
+      case LIBUSB_ERROR_NO_DEVICE:
+         return "LIBUSB_ERROR_NO_DEVICE";
+      /** Entity not found */
+      case LIBUSB_ERROR_NOT_FOUND:
+         return "LIBUSB_ERROR_NOT_FOUND";
+      /** Resource busy */
+      case LIBUSB_ERROR_BUSY:
+         return "LIBUSB_ERROR_BUSY";
+      /** Operation timed out */
+      case LIBUSB_ERROR_TIMEOUT:
+         return "LIBUSB_ERROR_TIMEOUT";
+      /** Overflow */
+      case LIBUSB_ERROR_OVERFLOW:
+         return "LIBUSB_ERROR_OVERFLOW";
+      /** Pipe error */
+      case LIBUSB_ERROR_PIPE:
+         return "LIBUSB_ERROR_PIPE";
+      /** System call interrupted (perhaps due to signal) */
+      case LIBUSB_ERROR_INTERRUPTED:
+         return "LIBUSB_ERROR_INTERRUPTED";
+      /** Insufficient memory */
+      case LIBUSB_ERROR_NO_MEM:
+         return "LIBUSB_ERROR_NO_MEM";
+      /** Operation not supported or unimplemented on this platform */
+      case LIBUSB_ERROR_NOT_SUPPORTED:
+         return "LIBUSB_ERROR_NOT_SUPPORTED";
+      /** Other error */
+      case LIBUSB_ERROR_OTHER:
+         return "LIBUSB_ERROR_OTHER";
+      default:
+         return "LIBUSB_ERROR_????";
+      }
+}
+#endif
+
 #ifdef LOG
 // Uncomment for copious log of low-level USB transactions
 //#define LOG_LOW_LEVEL
@@ -167,7 +220,24 @@ void milliSleep(int milliSeconds) {
       else if (sleepStruct.tv_sec > 0)
          Logging::print("milliSleep() - time not completed!!\n");
    } while ((rc < 0) && (errno == EINTR));
-#else
+#endif
+
+#ifdef __APPLE__
+   LOGGING;
+   int rc;
+   struct timespec sleepStruct = { 0, 1000000L*milliSeconds };
+   Logging::print("%ld ns\n", sleepStruct.tv_nsec);
+   do {
+      rc = nanosleep(&sleepStruct, &sleepStruct);
+      if ((rc < 0) && (errno == EINTR))
+         Logging::print("milliSleep() - Sleep interrupted\n");
+      else if (sleepStruct.tv_sec > 0)
+         Logging::print("milliSleep() - time not completed!!\n");
+   } while ((rc < 0) && (errno == EINTR));
+#endif
+
+
+#ifdef __WIN32__
    Sleep(milliSeconds);
 #endif
 }

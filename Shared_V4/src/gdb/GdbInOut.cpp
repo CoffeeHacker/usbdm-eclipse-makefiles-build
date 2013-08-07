@@ -38,6 +38,7 @@
 #include <fcntl.h>
 #endif
 #include <stdio.h>
+#include <cstdlib>
 
 #include <pthread.h>
 #include <unistd.h>

@@ -55,6 +55,12 @@
 #include "AdvancedPanel.h"
 #include "Log.h"
 
+#ifdef __APPLE__
+ typedef uint64_t tulong;
+ #else
+ typedef uint32_t tulong;
+#endif
+
 const string settingsKey("AdvancedPanel");
 
 enum {
@@ -520,7 +526,7 @@ int AdvancedPanel::findPartitionControlIndex(unsigned backingStoreSize) {
  */
 void AdvancedPanel::OnFlexNvmPartionChoiceSelected( wxCommandEvent& event ) {
    // Get currently selected FlexNVM partition choice
-   flexNvmPartitionIndex = (int) event.GetClientData();
+   flexNvmPartitionIndex = (int)(tulong) event.GetClientData();
    Logging::print("AdvancedPanel::OnFlexNvmPartionChoiceSelected(): Partition value =0x%02X\n", flexNvmPartitionIndex);
    TransferDataToWindow();
 }
@@ -820,7 +826,7 @@ void AdvancedPanel::updateSecurity() {
    Logging log("AdvancedPanel::updateSecurity");
    populateSecurityControl();
    Logging::print("securityMemoryRegionIndex = %d\n", securityMemoryRegionIndex);
-   int memoryIndex = (int)securityMemoryRegionChoice->GetClientData(securityMemoryRegionIndex);
+   int memoryIndex = (int)(tulong)securityMemoryRegionChoice->GetClientData(securityMemoryRegionIndex);
    Logging::print("memoryIndex = %d\n", memoryIndex);
    MemoryRegionConstPtr   memoryRegionPtr = currentDevice->getMemoryRegion(memoryIndex);
    SecurityEntryConstPtr  securityEntry;
@@ -828,7 +834,7 @@ void AdvancedPanel::updateSecurity() {
    securityInfoPtr        = SecurityInfoPtr((SecurityInfo *)0);
    securityDescriptionPtr = SecurityDescriptionPtr((SecurityDescription *)0);
 
-   wxString sDescription("");
+   wxString sDescription(wxT(""));
 
    SecurityValidator *validator = dynamic_cast<SecurityValidator*>(securityValuesTextControl->GetValidator());
    if (memoryRegionPtr == NULL) {
@@ -848,7 +854,7 @@ void AdvancedPanel::updateSecurity() {
                Logging::print("SEC_DEFAULT\n");
                securityValuesTextControl->SetValue(_("[Using values from flash image]"));
                securityInfoPtr = SecurityInfoPtr();
-               sDescription = ", determined by Flash image";
+               sDescription = wxT(", determined by Flash image");
                break;
             case SEC_SECURED:
                Logging::print("SEC_SECURED\n");
@@ -857,7 +863,7 @@ void AdvancedPanel::updateSecurity() {
                }
                *securedInfoPtr  = *securityEntry->getSecureInformation();
                securityInfoPtr  = securedInfoPtr;
-               sDescription = ", using default secured value";
+               sDescription = wxT(", using default secured value");
                break;
             case SEC_UNSECURED:
             case SEC_SMART:
@@ -867,7 +873,7 @@ void AdvancedPanel::updateSecurity() {
                }
                *unsecuredInfoPtr = *securityEntry->getUnsecureInformation();
                securityInfoPtr   = unsecuredInfoPtr;
-               sDescription = ", using default unsecured value";
+               sDescription = wxT(", using default unsecured value");
                break;
             case SEC_CUSTOM:
                Logging::print("SEC_CUSTOM\n");
@@ -878,7 +884,7 @@ void AdvancedPanel::updateSecurity() {
                }
                securityInfoPtr = customSecurityInfoPtr[securityMemoryRegionIndex];
                Logging::print("Setting to Custom %s\n", (const char *)customSecurityInfoPtr[securityMemoryRegionIndex]->toString().c_str());
-               sDescription = ", using custom security value";
+               sDescription = wxT(", using custom security value");
                break;
          }
       }
@@ -1033,7 +1039,7 @@ bool AdvancedPanel::updateState() {
       Logging::print("SEC_CUSTOM\n");
       // Transfer custom security setting to device
       for(unsigned index=0; index<securityMemoryRegionChoice->GetCount(); index++) {
-         int memoryIndex = (int)securityMemoryRegionChoice->GetClientData(index);
+         int memoryIndex = (int)(tulong)securityMemoryRegionChoice->GetClientData(index);
          Logging::print("memoryIndex = %d\n", memoryIndex);
          MemoryRegionPtr memoryRegionPtr = currentDevice->getMemoryRegion(memoryIndex);
          if (memoryRegionPtr == NULL) {

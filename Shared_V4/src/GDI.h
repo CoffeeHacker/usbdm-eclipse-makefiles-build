@@ -55,6 +55,17 @@
        //! This definition is used when USBDM_API.h is being imported (using DLL)
       #define USBDM_GDI_API
    #endif
+#elif __APPLE__
+   #if defined(GDI)
+      //! This definition is used when USBDM_API.h is being exported (creating GDI_DLL)
+      #define USBDM_GDI_API extern "C" __attribute__ ((visibility ("default")))
+   #elif defined (COMMANDLINE) || defined (DOC)
+      //! This empty definition is used for the command-line version that statically links the DLL routines
+      #define USBDM_GDI_API
+   #else
+       //! This definition is used when USBDM_API.h is being imported (using DLL)
+      #define USBDM_GDI_API
+   #endif
 #elif defined _WIN32
    #if defined(GDI)
        //! This definition is used when USBDM_API.h is being exported (creating GDI_DLL)
@@ -257,7 +268,7 @@ typedef struct {
    DiBoolT           fCodeHardWareBpSkids;
    void              *pReserved;
 } DiFeaturesT, *pDiFeaturesT;
-#pragma pack()
+
 
 //! 2.3.43 DiRegisterInfoT
 typedef struct {

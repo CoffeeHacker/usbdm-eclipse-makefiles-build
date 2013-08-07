@@ -40,7 +40,9 @@
 #include <stdio.h>
 
 #include <pthread.h>
-#include <io.h>
+#include <string.h>
+#include <errno.h>
+#include <cstdio>
 #include <fcntl.h>
 #include <unistd.h>
 
@@ -55,10 +57,14 @@ GdbInOutPipe::GdbInOutPipe() :
    readyPacket(NULL) {
 
    fdIn   = dup(fileno(stdin));
+   fdOut = dup(fileno(stdout));
+
+
+#ifdef _WIN32
    setmode( fdIn, _O_BINARY );
 
-   fdOut = dup(fileno(stdout));
    setmode( fdOut, _O_BINARY );
+#endif
 
    connectionActive = true;
 }

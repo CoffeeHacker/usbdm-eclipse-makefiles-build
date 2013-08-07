@@ -193,7 +193,7 @@ void bootloaderDialogue::setSerialNumber(const wxString &serialNumber) {
 
    uint8_t  ICP_Offset             = flashImageDescription.flashImage[flashImageDescription.protectAddr-2]; // Offset to end of ICP block
    uint16_t ICP_Address            = flashImageDescription.protectAddr-ICP_Offset-sizeof(ICP_dataType);     // Address of ICP block
-   uint16_t SN_Address             = ICP_Address + (int)&ICP_data.serialNumber-(int)&ICP_data;
+   uint16_t SN_Address             = ICP_Address + (int)(uint64_t)&ICP_data.serialNumber-(int)(uint64_t)&ICP_data;
    uint16_t Checksum_Address       = flashImageDescription.protectAddr-1;
    int maxSerialNumberLength  = sizeof(ICP_data.serialNumber);
 

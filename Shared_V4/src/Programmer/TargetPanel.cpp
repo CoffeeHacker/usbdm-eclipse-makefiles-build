@@ -71,6 +71,13 @@ Change History
 #include "USBDM_DSC_API.h"
 #endif
 
+#ifdef __APPLE__
+ typedef uint64_t tulong;
+ #else
+ typedef uint32_t tulong;
+#endif
+
+
 #define MASS_ERASE_NEVER     0
 #define MASS_ERASE_OPTIONAL  1
 #define MASS_ERASE_ALWAYS    2
@@ -536,7 +543,7 @@ TargetPanel::TargetPanel( wxWindow* parent, SharedPtr shared, HardwareCapabiliti
       flashprogrammer(NULL),
       beep(0)   {
    Logging log("TargetPanel::TargetPanel");
-   logWindow = new wxLogWindow(this, "Log Window", false, false);
+   logWindow = new wxLogWindow(this, wxT("Log Window"), false, false);
    logWindow->SetTimestamp(wxEmptyString);
    Init();
    Create(parent);
@@ -544,7 +551,7 @@ TargetPanel::TargetPanel( wxWindow* parent, SharedPtr shared, HardwareCapabiliti
 
 bool TargetPanel::Create(wxWindow* parent) {
    Logging log("TargetPanel::Create");
-   wxLogMessage("TargetPanel::Create");
+   wxLogMessage(wxT("TargetPanel::Create"));
 
    if (!wxPanel::Create(parent) || !CreateControls()) {
       return false;
@@ -919,7 +926,7 @@ bool TargetPanel::TransferDataToWindow() {
    if (!eraseChoiceControl->SetStringSelection(wxString(DeviceData::getEraseOptionName(currentDevice->getEraseOption()),wxConvUTF7))) {
       // Current erase option not supported - default to 1st item
       eraseChoiceControl->SetSelection(0);
-      DeviceData::EraseOptions eraseOption = (DeviceData::EraseOptions)(int)eraseChoiceControl->GetClientData(0);
+      DeviceData::EraseOptions eraseOption = (DeviceData::EraseOptions)(int)(tulong)eraseChoiceControl->GetClientData(0);
       currentDevice->setEraseOption(eraseOption);
    }
 #if defined(FLASH_PROGRAMMER)
@@ -1130,7 +1137,7 @@ void TargetPanel::OnAutoFileReloadCheckboxClick( wxCommandEvent& event ) {
  */
 void TargetPanel::OnDeviceTypeChoiceSelected( wxCommandEvent& event ) {
    // Get currently selected device type
-   int deviceIndex = (int) event.GetClientData();
+   int deviceIndex = (int)(tulong) event.GetClientData();
    Logging::print("TargetPanel::OnDeviceTypeChoiceSelected(): devIndex=%d\n", deviceIndex);
    setDeviceIndex(deviceIndex);
    TransferDataToWindow();
@@ -1639,7 +1646,7 @@ void TargetPanel::OnSoundCheckboxClick( wxCommandEvent& event ) {
 //!
 void TargetPanel::OnEraseChoiceSelect( wxCommandEvent& event ) {
    int selIndex = event.GetSelection();
-   DeviceData::EraseOptions eraseOption = (DeviceData::EraseOptions)(int)eraseChoiceControl->GetClientData(selIndex);
+   DeviceData::EraseOptions eraseOption = (DeviceData::EraseOptions)(int)(tulong)eraseChoiceControl->GetClientData(selIndex);
    currentDevice->setEraseOption(eraseOption);
 #if defined (FLASH_PROGRAMMER)
    updateProgrammingState();

@@ -11,4 +11,5 @@ SRC += Version.rc
 # Shared files $(SHARED_SRC)/Programmer
 VPATH := $(VPATH) $(SHARED_SRC)
 INCS += -I$(SHARED_SRC)
+INCS += -I/opt/local/include
 SRC += Names.cpp

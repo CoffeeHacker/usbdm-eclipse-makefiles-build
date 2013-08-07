@@ -70,7 +70,7 @@ END_EVENT_TABLE()
 /*  Constructor
  */
 GdbServerWindow::GdbServerWindow(SharedPtr shared, AppSettings &appSettings) :
-   wxFrame((wxFrame *)NULL, wxID_ANY, _("USBDM GDB Server"), wxDefaultPosition, wxDefaultSize),
+   wxFrame((wxFrame *)NULL, wxID_ANY, wxT("USBDM GDB Server"), wxDefaultPosition, wxDefaultSize),
    shared(shared),
    appSettings(appSettings),
    verboseLog(false),
@@ -88,7 +88,7 @@ GdbServerWindow::GdbServerWindow(SharedPtr shared, AppSettings &appSettings) :
    menuBar = new wxMenuBar();
 
    wxMenu *menuServer = new wxMenu();
-   menuServer->Append(SERVER_RESTART,        _("&Change Server Settings"),  _("Restarts server with new settings"));
+   menuServer->Append(SERVER_RESTART,        wxT("&Change Server Settings"),  wxT("Restarts server with new settings"));
    menuServer->AppendSeparator();
    menuServer->Append(SERVER_DROPCONNECTION, _("&Drop Connection"),  _("Forcibly drop connection"));
    menuServer->Append(SERVER_QUIT,           _("E&xit\tAlt-X"),      _("Quit server"));
@@ -147,7 +147,7 @@ USBDM_ErrorCode GdbServerWindow::doSettingsDialogue() {
    LOGGING;
 
    // Create the setting dialogue
-   UsbdmDialogue usbdmDialogue(shared, appSettings, "GDB Settings");
+   UsbdmDialogue usbdmDialogue(shared, appSettings, _("GDB Settings"));
    return usbdmDialogue.execute();
 }
 
@@ -173,11 +173,11 @@ GdbServerWindow::~GdbServerWindow() {
 wxString GdbServerWindow::getAddr(IPaddress addr) {
    wxString *serverAddr = new wxString();
 
-   if (addr.IPAddress().compare("127.0.0.1") == 0) {
-      serverAddr->Printf("localhost:%u", addr.Service());
+   if (addr.IPAddress().compare(_("127.0.0.1")) == 0) {
+      serverAddr->Printf(_("localhost:%u"), addr.Service());
    }
    else {
-      serverAddr->Printf("%s:%u", addr.IPAddress(), addr.Service());
+      serverAddr->Printf(_("%s:%u"), string(addr.IPAddress().mb_str()).c_str(), addr.Service());
    }
    return *serverAddr;
 }
@@ -191,7 +191,7 @@ void GdbServerWindow::createServer() {
    // Create the address
    IPaddress listenAddr;
    listenAddr.Service(shared->getGdbServerPort());
-   listenAddr.Hostname("localhost");
+   listenAddr.Hostname(_("localhost"));
    serverAddr = getAddr(listenAddr);
 
    closeServer();
@@ -201,30 +201,35 @@ void GdbServerWindow::createServer() {
 
    // We use IsOk() here to see if the server is really listening
    if (!serverSocket->IsOk()) {
-      statusTextControl->AppendText("ERROR: Could not create server at the specified port !\n");
+      statusTextControl->AppendText(_("ERROR: Could not create server at the specified port !\n"));
       return;
    }
 
    string bdmSerialNumber = shared->getBdmSerialNumber();
    if (bdmSerialNumber.length() > 0) {
       if (shared->getBdmMatchRequired()) {
-         statusTextControl->AppendText("Using required USBDM interface S/N = \'"+bdmSerialNumber+"\'\n");
+         statusTextControl->AppendText(_("Using required USBDM interface S/N = \'"));
+	 statusTextControl->AppendText(wxString ( bdmSerialNumber.c_str(), wxConvUTF8));
+	 statusTextControl->AppendText(_("\'\n"));
       }
       else {
-         statusTextControl->AppendText("Using preferred USBDM interface S/N = \'"+bdmSerialNumber+"\'\n");
+         statusTextControl->AppendText(_("Using preferred USBDM interface S/N = \'"));
+	 statusTextControl->AppendText(wxString ( bdmSerialNumber.c_str(), wxConvUTF8));
+	 statusTextControl->AppendText(_("\'\n"));
+
       }
    }
    else {
-      statusTextControl->AppendText("Using any suitable USBDM interface\n");
+      statusTextControl->AppendText(_("Using any suitable USBDM interface\n"));
    }
    IPaddress addrReal;
    if (!serverSocket->GetLocal(addrReal) ) {
-      statusTextControl->AppendText("ERROR: couldn't get the address we bound to\n");
+      statusTextControl->AppendText(_("ERROR: couldn't get the address we bound to\n"));
    }
    else {
       serverAddr = getAddr(addrReal);
       wxString s;
-      s.Printf("Server created @%s\n", serverAddr);
+      s.Printf(_("Server created @%s\n"), string(serverAddr.mb_str()).c_str());
       statusTextControl->AppendText(s);
    }
 
@@ -243,7 +248,7 @@ void GdbServerWindow::closeServer() {
    dropConnection();
 
    if (serverSocket != NULL) {
-      statusTextControl->AppendText("Stopping Server\n");
+      statusTextControl->AppendText(_("Stopping Server\n"));
       serverSocket->Destroy();
       serverSocket = NULL;
    }
@@ -255,10 +260,9 @@ bool GdbServerWindow::confirmDropConnection() {
    if (serverState != connected) {
       return true;
    }
-   int getYesNo = wxMessageBox("There is a current GDB connection.\n\n"
-                "Drop this connection?",
-                "Active Connection Warning",
-                wxOK|wxCANCEL|wxCANCEL_DEFAULT,
+   int getYesNo = wxMessageBox(_("There is a current GDB connection.\n\nDrop this connection?"),
+                _("Active Connection Warning"),
+                wxOK|wxCANCEL,
                 this
                 );
    return (getYesNo == wxOK);
@@ -341,7 +345,7 @@ void GdbServerWindow::OnShowLogWindow(wxCommandEvent& event) {
  */
 void GdbServerWindow::OnResetTarget(wxCommandEvent& event) {
    usbdmResetTarget();
-   statusTextControl->AppendText("User reset of target - step GDB to synchronise\n");
+   statusTextControl->AppendText(_("User reset of target - step GDB to synchronise\n"));
 }
 
 /*!  Handler for Set Speed menu item
@@ -360,13 +364,13 @@ void GdbServerWindow::OnSetSpeed(wxCommandEvent& event) {
  */
 void GdbServerWindow::OnServerEvent(wxSocketEvent& event) {
    if (event.GetSocketEvent() != wxSOCKET_CONNECTION) {
-      statusTextControl->AppendText("Unexpected event on Server\n");
+      statusTextControl->AppendText(_("Unexpected event on Server\n"));
       // Ignore
       return;
    }
 
    if (clientSocket != NULL) {
-      statusTextControl->AppendText("Client connection while busy - rejected\n");
+      statusTextControl->AppendText(_("Client connection while busy - rejected\n"));
       wxSocketBase *clientSocket = serverSocket->Accept(false);
       clientSocket->Destroy();
       return;
@@ -379,30 +383,30 @@ void GdbServerWindow::OnServerEvent(wxSocketEvent& event) {
 
    clientSocket = serverSocket->Accept(false);
    if (clientSocket == NULL) {
-      statusTextControl->AppendText("Error: couldn't accept a new connection\n");
+      statusTextControl->AppendText(_("Error: couldn't accept a new connection\n"));
       return;
    }
 
    IPaddress peerAddr;
    if ( !clientSocket->GetPeer(peerAddr) ) {
-      statusTextControl->AppendText("New connection from unknown client accepted.\n");
+      statusTextControl->AppendText(_("New connection from unknown client accepted.\n"));
    }
    else {
       clientAddr = getAddr(peerAddr);
-      statusTextControl->AppendText(
-            "\n=====================================\n"
-            "New client connection from "+ clientAddr + " accepted\n");
+      statusTextControl->AppendText(_("\n=====================================\nNew client connection from "));
+      statusTextControl->AppendText(clientAddr);
+      statusTextControl->AppendText(_(" accepted\n"));
    }
 
    USBDM_ErrorCode rc = shared->initBdm();
    if (rc != BDM_RC_OK) {
       reportError("BDM Open failed, reason: ", rc);
-      statusTextControl->AppendText("BDM Open failed\n");
+      statusTextControl->AppendText(_("BDM Open failed\n"));
       dropConnection();
       return;
    }
 
-   statusTextControl->AppendText("BDM Open OK\n");
+   statusTextControl->AppendText(_("BDM Open OK\n"));
 
    // Subscribe to socket events
    //  wxSOCKET_INPUT_FLAG - received data
@@ -456,16 +460,16 @@ void GdbServerWindow::dropConnection() {
    if (clientSocket != NULL) {
       clientSocket->Destroy();
       clientSocket = NULL;
-      statusTextControl->AppendText(
+      statusTextControl->AppendText(_(
             "\n=====================\n"
-            "Dropped connection\n");
+            "Dropped connection\n"));
       if (shared->isExitOnClose()) {
-         statusTextControl->AppendText("Closing\n\n");
+         statusTextControl->AppendText(_("Closing\n\n"));
          Close(true);
       }
    }
    serverState  = listening;
-   clientAddr = "None";
+   clientAddr = _("None");
    targetStatus = T_UNKNOWN;
    UpdateStatusBar();
 }
@@ -476,10 +480,10 @@ void GdbServerWindow::dropConnection() {
  *   @param rc    Error code
  */
 void GdbServerWindow::reportError(const char *msg, USBDM_ErrorCode rc) {
-   statusTextControl->AppendText(msg);
+   statusTextControl->AppendText(wxString(msg, wxConvUTF8));
    if (rc != BDM_RC_OK) {
-      statusTextControl->AppendText(USBDM_GetErrorString(rc));
-      statusTextControl->AppendText("\n");
+      statusTextControl->AppendText(wxString(USBDM_GetErrorString(rc), wxConvUTF8));
+      statusTextControl->AppendText(_("\n"));
    }
 }
 
@@ -514,7 +518,7 @@ USBDM_ErrorCode GdbServerWindow::GdbMessageWrapper::callback(const char *msg, Gd
  */
 void GdbServerWindow::OnSocketEvent(wxSocketEvent& event) {
    if (event.GetSocket() != clientSocket) {
-      statusTextControl->AppendText("Event from unknown socket\n");
+      statusTextControl->AppendText(_("Event from unknown socket\n"));
       return;
    }
    // Now we process the event
@@ -532,7 +536,7 @@ void GdbServerWindow::OnSocketEvent(wxSocketEvent& event) {
             if (packet != NULL) {
                rc = doGdbCommand(packet);
                if (rc != BDM_RC_OK) {
-                  statusTextControl->AppendText(USBDM_GetErrorString(rc));
+                  statusTextControl->AppendText(wxString(USBDM_GetErrorString(rc),wxConvUTF8));
                }
             }
          } while ((packet != NULL) && (rc == BDM_RC_OK) && !deferredFail);
@@ -613,16 +617,16 @@ void GdbServerWindow::UpdateStatusBar() {
    wxString targetStatusString = wxEmptyString;
    switch (targetStatus) {
       case T_RUNNING:
-         targetStatusString = "Running";
+         targetStatusString = _("Running");
          break;
       case T_SLEEPING:
-         targetStatusString = "Sleeping";
+         targetStatusString = _("Sleeping");
          break;
       case T_HALT:
-         targetStatusString = "Stopped";
+         targetStatusString = _("Stopped");
          break;
       default:
-         targetStatusString = "";
+         targetStatusString = _("");
          break;
    }
    SetStatusText(targetStatusString, 2);

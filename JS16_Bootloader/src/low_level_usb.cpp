@@ -154,6 +154,17 @@ void milliSleep(int milliSeconds) {
       else if (sleepStruct.tv_sec > 0)
          Logging::print("milliSleep() - time not completed!!\n");
    } while ((rc < 0) && (errno == EINTR));
+#elif __APPLE__
+   int rc;
+   struct timespec sleepStruct = { 0, 1000000L*milliSeconds };
+   Logging::print("milliSleep(%ld ns)\n", sleepStruct.tv_nsec);
+   do {
+      rc = nanosleep(&sleepStruct, &sleepStruct);
+      if ((rc < 0) && (errno == EINTR))
+         Logging::print("milliSleep() - Sleep interrupted\n");
+      else if (sleepStruct.tv_sec > 0)
+         Logging::print("milliSleep() - time not completed!!\n");
+   } while ((rc < 0) && (errno == EINTR));
 #else
    Sleep(milliSeconds);
 #endif

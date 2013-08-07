@@ -364,7 +364,7 @@ bool FlashProgrammerApp::OnCmdLineParsed(wxCmdLineParser& parser) {
          USBDM_ErrorCode rc = shared->setCurrentDeviceByName((const char *)sValue.ToAscii());
          if (rc != BDM_RC_OK) {
             log.print("Failed to set device to \'%s\'\n", (const char *)sValue.ToAscii());
-            parser.AddUsageText("***** Error: Failed to find device.\n");
+            wxLogError(wxT("***** Error: Failed to find device.\n"));
             success = false;
          }
          else {
@@ -410,7 +410,7 @@ bool FlashProgrammerApp::OnCmdLineParsed(wxCmdLineParser& parser) {
       if (parser.Found(_("nvloc"), &sValue)) {
          unsigned long uValue;
          if (!sValue.ToULong(&uValue, 16)) {
-            parser.AddUsageText("***** Error: Illegal nvloc value.\n");
+             wxLogError(wxT("***** Error: Illegal nvloc value.\n"));
             success = false;
          }
          deviceData->setClockTrimNVAddress(uValue);
@@ -429,7 +429,7 @@ bool FlashProgrammerApp::OnCmdLineParsed(wxCmdLineParser& parser) {
             deviceData->setEraseOption(DeviceData::eraseNone);
          }
          else {
-            parser.AddUsageText("***** Error: Illegal erase value.\n");
+            wxLogError(wxT("***** Error: Illegal erase value.\n"));
             success = false;
          }
       }
@@ -441,14 +441,14 @@ bool FlashProgrammerApp::OnCmdLineParsed(wxCmdLineParser& parser) {
             bdmOptions.targetVdd = BDM_TARGET_VDD_5V;
          }
          else {
-            parser.AddUsageText("***** Error: Illegal vdd value.\n");
+            wxLogError(wxT("***** Error: Illegal vdd value.\n"));
             success = false;
          }
       }
       if (parser.Found(_("trim"), &sValue)) {
          double    dValue;
          if (!sValue.ToDouble(&dValue)) {
-            parser.AddUsageText("***** Error: Illegal trim value.\n");
+            wxLogError(wxT("***** Error: Illegal trim value.\n"));
             success = false;
          }
          deviceData->setClockTrimFreq(dValue * 1000);
@@ -465,7 +465,7 @@ bool FlashProgrammerApp::OnCmdLineParsed(wxCmdLineParser& parser) {
          int index2 = sValue.find(',');
          wxString t = sValue.substr(index1, index2-index1);
          if (!t.ToULong(&uValue, 16)) {
-            parser.AddUsageText("***** Error: Illegal flexNVM value.\n");
+            wxLogError(wxT("***** Error: Illegal flexNVM value.\n"));
             success = false;
          }
          else {
@@ -477,7 +477,7 @@ bool FlashProgrammerApp::OnCmdLineParsed(wxCmdLineParser& parser) {
          index2 = sValue.find(',', index1);
          t = sValue.substr(index1, index2-index1);
          if (!t.ToULong(&uValue, 16)) {
-            parser.AddUsageText("***** Error: Illegal flexNVM value.\n");
+            wxLogError(wxT("***** Error: Illegal flexNVM value.\n"));
             success = false;
          }
          else {
@@ -496,7 +496,7 @@ bool FlashProgrammerApp::OnCmdLineParsed(wxCmdLineParser& parser) {
          int index2 = sValue.find(',');
          wxString t = sValue.substr(index1, index2-index1);
          if (!t.ToULong(&uValue, 10)) {
-            parser.AddUsageText("***** Error: Illegal reset value.\n");
+            wxLogError(wxT("***** Error: Illegal reset value.\n"));
             success = false;
          }
          bdmOptions.resetDuration = uValue;
@@ -505,7 +505,7 @@ bool FlashProgrammerApp::OnCmdLineParsed(wxCmdLineParser& parser) {
          index2 = sValue.find(',', index1);
          t = sValue.substr(index1, index2-index1);
          if (!t.ToULong(&uValue, 10)) {
-            parser.AddUsageText("***** Error: Illegal reset value.\n");
+            wxLogError(wxT("***** Error: Illegal reset value.\n"));
             success = false;
          }
          bdmOptions.resetReleaseInterval = uValue;
@@ -514,7 +514,7 @@ bool FlashProgrammerApp::OnCmdLineParsed(wxCmdLineParser& parser) {
          index2 = sValue.length();
          t = sValue.substr(index1, index2-index1);
          if (!t.ToULong(&uValue, 10)) {
-            parser.AddUsageText("***** Error: Illegal reset value.\n");
+            wxLogError(wxT("***** Error: Illegal reset value.\n"));
             success = false;
          }
          bdmOptions.resetRecoveryInterval = uValue;
@@ -527,7 +527,7 @@ bool FlashProgrammerApp::OnCmdLineParsed(wxCmdLineParser& parser) {
          int index2 = sValue.find(',');
          wxString t = sValue.substr(index1, index2-index1);
          if (!t.ToULong(&uValue, 10)) {
-            parser.AddUsageText("***** Error: Illegal power value.\n");
+            wxLogError(wxT("***** Error: Illegal power value.\n"));
             success = false;
          }
          bdmOptions.powerOffDuration = uValue;
@@ -536,7 +536,7 @@ bool FlashProgrammerApp::OnCmdLineParsed(wxCmdLineParser& parser) {
          index2 = sValue.length();
          t = sValue.substr(index1, index2-index1);
          if (!t.ToULong(&uValue, 10)) {
-            parser.AddUsageText("***** Error: Illegal power value.\n");
+            wxLogError(wxT("***** Error: Illegal power value.\n"));
             success = false;
          }
          bdmOptions.powerOnRecoveryInterval = uValue;
@@ -544,7 +544,7 @@ bool FlashProgrammerApp::OnCmdLineParsed(wxCmdLineParser& parser) {
       if (parser.Found(_("speed"), &sValue)) {
          unsigned long uValue;
          if (sValue.ToULong(&uValue, 10)) {
-            parser.AddUsageText("***** Error: Illegal speed value.\n");
+            wxLogError(wxT("***** Error: Illegal speed value.\n"));
             success = false;
          }
          bdmOptions.interfaceFrequency = uValue;

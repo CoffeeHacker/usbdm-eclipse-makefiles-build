@@ -21,6 +21,12 @@
 #define WXSTUB_DLL_NAME "libusbdm-wxStub.so"
 #endif
 
+#ifdef __APPLE__
+#include <dlfcn.h>
+#define WXSTUB_DLL_NAME "libusbdm-wxStub.dylib"
+#endif
+
+
 #include "Common.h"
 #include "Log.h"
 
@@ -186,6 +192,12 @@ int main(int argc, char **argv) {
    // Load wxWindows Stub (for pop-up dialogues)
    (void)dlopen(WXSTUB_DLL_NAME, RTLD_NOW|RTLD_NODELETE);
 #endif
+
+#ifdef __APPLE__
+   // Load wxWindows Stub (for pop-up dialogues)
+   (void)dlopen(WXSTUB_DLL_NAME, RTLD_NOW|RTLD_NODELETE);
+#endif
+
 
 #ifdef LOG
    char buff[1000];

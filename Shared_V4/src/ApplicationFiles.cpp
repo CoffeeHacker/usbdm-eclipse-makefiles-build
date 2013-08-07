@@ -76,7 +76,17 @@ string getInstallationDir(void) {
 
 string getDataDir(void) {
 #ifdef useWxWidgets
+
+#ifdef __APPLE__
+      wxStandardPaths std;
+      static wxString path = std.GetExecutablePath();
+      wxFileName exePath(path);
+   
+   return string(wxFileName( exePath.GetPath(), wxEmptyString ).GetFullPath().ToAscii());
+
+#else
    return string(wxStandardPaths::Get().GetDataDir().ToAscii());
+#endif
 #else
    char buff[1000];
    getDataDir(buff, sizeof(buff));

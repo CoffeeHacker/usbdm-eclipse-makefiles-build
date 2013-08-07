@@ -35,7 +35,14 @@
 #ifdef __unix__
 #include <time.h>
 #include <errno.h>
-#else
+#endif
+
+#ifdef __APPLE__
+#include <time.h>
+#include <errno.h>
+#endif
+
+#ifdef __WIN32::
 #include <windows.h>
 #endif
 
@@ -62,10 +69,21 @@ void milliSleep(int milliSeconds) {
    do {
       rc = nanosleep(&sleepStruct, &sleepStruct);
    } while ((rc < 0) && (errno == EINTR));
-#elif defined(_WIN32)
+#endif
+
+#ifdef __APPLE__
+   int rc;
+   struct timespec sleepStruct;
+   sleepStruct.tv_sec  = milliSeconds/1000;
+   sleepStruct.tv_nsec = (milliSeconds%1000)*1000000L;
+   do {
+      rc = nanosleep(&sleepStruct, &sleepStruct);
+   } while ((rc < 0) && (errno == EINTR));
+#endif
+
+
+#ifdef _WIN32_
    Sleep(milliSeconds);
-#else
-#error "Don't know how to sleep!"
 #endif
 }
 

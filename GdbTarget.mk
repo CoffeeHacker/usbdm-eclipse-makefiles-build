@@ -40,7 +40,7 @@ LIBS += -l$(LIB_USBDM)
 LIBS += -l$(LIB_USBDM_TCL)
 LIBS += -l$(LIB_WX_PLUGIN)
 LIBS += $(XERCES_LIBS)
-LIBS += $(LIB_SOCKETS)
+#LIBS += $(LIB_SOCKETS)
 
 # Each module will add to this
 SRC :=

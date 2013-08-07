@@ -70,6 +70,20 @@ static FILE *openApplicationFile(const char *fileName) {
 }
 #endif
 
+#ifdef __APPLE__
+static FILE *openApplicationFile(const char *fileName) {
+
+   char tempPathname[64];
+   int tempFiledescriptor = -1;
+   FILE *fp = NULL;
+   strcpy(tempPathname, "/var/tmp/usbdm-XXXXXX"); // Filename template
+   tempFiledescriptor=mkstemp(tempPathname);
+   if (tempFiledescriptor >=0)
+      fp = fdopen(tempFiledescriptor, "w"); // Convert to stream
+   return fp;
+}
+#endif
+
 #ifdef WIN32
 #define _WIN32_IE 0x0500      //!< Required for later system calls.
 #define _WIN32_WINNT 0x0500   //!< Required for later system calls.

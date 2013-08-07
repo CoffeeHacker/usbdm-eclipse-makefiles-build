@@ -29,7 +29,7 @@ typedef int bool;
 #include "FindWindow.h"
 #include "tcl.h"
 #else
-#include "tcl8.5/tcl.h"
+#include <tcl.h>
 #endif
 #include "Names.h"
 #include "Common.h"
